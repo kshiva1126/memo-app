@@ -1,8 +1,18 @@
 {
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true, // 保存時に ESLint の自動修正を実行
-    "source.organizeImports": true // 保存時にインポートの整理も実行
+    "source.fixAll.eslint": true
   },
-  "editor.formatOnSave": true, // 保存時に自動フォーマットを実行
-  "editor.defaultFormatter": "esbenp.prettier-vscode" // デフォルトのフォーマッタを Prettier に設定
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
