@@ -10,3 +10,8 @@ compatibility_date = "2023-04-20"
 
 [build]
   command = "npm run build"
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "memo_app"
+database_id = "91645aef-ed78-4075-b791-d8adbf7e30bc"

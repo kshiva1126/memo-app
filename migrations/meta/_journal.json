@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1693059848811,
+      "tag": "0000_chief_giant_man",
+      "breakpoints": true
+    }
+  ]
+}

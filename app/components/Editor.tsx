@@ -7,7 +7,7 @@ type Props = {
 
 export function Editor({ value, setValue }: Props) {
   return (
-    <div className="container">
+    <div data-color-mode="light">
       <MDEditor
         value={value}
         preview={'edit'}
