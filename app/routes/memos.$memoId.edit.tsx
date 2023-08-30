@@ -8,13 +8,8 @@ import { memos } from "~/db/schema";
 import { sql } from "drizzle-orm";
 import { Input } from "~/components/ui/input";
 
-interface Env {
-  DB: D1Database;
-}
-
 export async function action({ request, context }: ActionArgs) {
   const body = await request.formData();
-  console.log(body.get("content"));
 
   const env = context.env as Env;
   const db = drizzle(env.DB);
