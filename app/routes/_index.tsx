@@ -61,7 +61,7 @@ export default function Index() {
   const data = useLoaderData<typeof loader>();
 
   return (
-    <div className="p-12">
+    <div className="p-4 lg:p-12">
       <h1 className="text-xl">Memo App</h1>
       <Form method="post" action="/?index" className="mt-4">
         <h2 className="text-lg">Create</h2>

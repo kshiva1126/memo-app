@@ -1,12 +1,19 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/cloudflare";
-import { Form, useLoaderData, useParams } from "@remix-run/react";
-import { useState } from "react";
+import {
+  Form,
+  Link,
+  useActionData,
+  useLoaderData,
+  useParams,
+} from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { Editor } from "~/components/Editor";
 import { Button } from "~/components/ui/button";
 import { drizzle } from "drizzle-orm/d1";
 import { memos } from "~/db/schema";
 import { sql } from "drizzle-orm";
 import { Input } from "~/components/ui/input";
+import { useToast } from "~/components/ui/use-toast";
 
 export async function action({ request, context }: ActionArgs) {
   const body = await request.formData();
@@ -22,7 +29,9 @@ export async function action({ request, context }: ActionArgs) {
     })
     .where(sql`id = ${body.get("id")}`);
 
-  return redirect(`/memos/${body.get("id")}/edit`);
+  return json({
+    message: "success",
+  });
 }
 
 export async function loader({ params, context }: LoaderArgs) {
@@ -58,24 +67,45 @@ export async function loader({ params, context }: LoaderArgs) {
 }
 
 export default function Edit() {
-  const data = useLoaderData<typeof loader>();
+  const { toast } = useToast();
+  const loaderData = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  useEffect(() => {
+    if (actionData?.message === "success") {
+      toast({
+        title: "保存しました",
+      });
+    }
+  }, [actionData]);
 
-  const [title, setTitle] = useState<string>(data.title);
-  const [content, setContent] = useState<string>(data.content);
+  const [title, setTitle] = useState<string>(loaderData.title);
+  const [content, setContent] = useState<string>(loaderData.content);
   const params = useParams();
   const id = params.memoId;
 
   return (
-    <Form method="post" action={`/memos/${id}/edit`}>
-      <input type="hidden" name="id" value={id} />
-      <Input
-        name="title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <Editor value={content} setValue={setContent} />
-      <textarea name="content" hidden readOnly value={content} />
-      <Button type="submit">登録する</Button>
-    </Form>
+    <div className="p-4 lg:p-12">
+      <Form method="post" action={`/memos/${id}/edit`}>
+        <input type="hidden" name="id" value={id} />
+        <Input
+          name="title"
+          value={title}
+          placeholder="タイトル"
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <div className="mt-2">
+          <Editor value={content} setValue={setContent} />
+        </div>
+        <textarea name="content" hidden readOnly value={content} />
+        <div className="mt-2 px-12 flex flex-col items-center gap-2">
+          <Button className="w-full" type="submit">
+            登録する
+          </Button>
+          <Button asChild className="w-full" variant="outline">
+            <Link to="/">戻る</Link>
+          </Button>
+        </div>
+      </Form>
+    </div>
   );
 }
