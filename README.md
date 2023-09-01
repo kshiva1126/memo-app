@@ -1,4 +1,4 @@
-# Welcome to Remix!
+# Remix + Cloudflare Workers
 
 - [Remix Docs](https://remix.run/docs)
 
@@ -12,6 +12,8 @@ You will be running two processes during development:
 Both are started with one command:
 
 ```sh
+npm run local:migrations:apply
+npm run seed
 npm run dev
 ```
 
