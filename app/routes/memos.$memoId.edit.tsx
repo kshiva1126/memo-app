@@ -99,7 +99,7 @@ export default function Edit() {
         <textarea name="content" hidden readOnly value={content} />
         <div className="mt-2 px-12 flex flex-col items-center gap-2">
           <Button className="w-full" type="submit">
-            登録する
+            保存する
           </Button>
           <Button asChild className="w-full" variant="outline">
             <Link to="/">戻る</Link>
