@@ -50,7 +50,14 @@ export async function loader({ context }: LoaderArgs) {
   const env = context.env as Env;
   const db = drizzle(env.DB);
   const data = await db
-    .select()
+    .select({
+      id: memos.id,
+      title: memos.title,
+      content: memos.content,
+      // MEMO: SQLite は UTC で保存されるので、日本時間に変換する
+      created_at: sql`datetime(${memos.created_at}, '+9 hours')`,
+      updated_at: sql`datetime(${memos.updated_at}, '+9 hours')`,
+    })
     .from(memos)
     .orderBy(sql`${memos.updated_at} DESC`);
 
@@ -81,9 +88,14 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle>{memo.title}</CardTitle>
                   <CardDescription>
-                    <span>
-                      {new Date(memo.updated_at).toLocaleString()}に更新
-                    </span>
+                    {memo?.updated_at && (
+                      <span>
+                        {new Date(memo.updated_at).toLocaleString("ja-JP", {
+                          timeZone: "Asia/Tokyo",
+                        })}
+                        に更新
+                      </span>
+                    )}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
