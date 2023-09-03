@@ -1,0 +1,1 @@
+ALTER TABLE memos ADD `user_id` integer NOT NULL;

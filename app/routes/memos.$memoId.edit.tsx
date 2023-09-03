@@ -11,9 +11,10 @@ import { Editor } from "~/components/Editor";
 import { Button } from "~/components/ui/button";
 import { drizzle } from "drizzle-orm/d1";
 import { memos } from "~/db/schema";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { Input } from "~/components/ui/input";
 import { useToast } from "~/components/ui/use-toast";
+import { getAuthenticator } from "~/features/common/services/auth.server";
 
 export async function action({ request, context }: ActionArgs) {
   const body = await request.formData();
@@ -34,30 +35,30 @@ export async function action({ request, context }: ActionArgs) {
   });
 }
 
-export async function loader({ params, context }: LoaderArgs) {
+export async function loader({ request, params, context }: LoaderArgs) {
+  const authenticator = getAuthenticator(context);
+  const user = await authenticator.isAuthenticated(request);
+  if (!user) {
+    return redirect("/");
+  }
+
   const env = context.env as Env;
   const db = drizzle(env.DB);
   const memoId = Number(params.memoId as string);
 
   if (Number.isNaN(memoId)) {
-    return redirect("/memos");
+    return redirect("/");
   }
 
   const data = await db
     .select()
     .from(memos)
-    .where(sql`id = ${memoId}`)
+    .where(eq(memos.user_id, user.id))
+    .where(eq(memos.id, memoId))
     .get();
 
   if (!data) {
-    // 空のデータを作成する
-    await db.insert(memos).values({
-      id: memoId,
-      title: "",
-      content: "",
-      created_at: sql`CURRENT_TIMESTAMP`,
-      updated_at: sql`CURRENT_TIMESTAMP`,
-    });
+    return redirect("/");
   }
 
   return json({
@@ -102,7 +103,7 @@ export default function Edit() {
             保存する
           </Button>
           <Button asChild className="w-full" variant="outline">
-            <Link to="/">戻る</Link>
+            <Link to="/">一覧に戻る</Link>
           </Button>
         </div>
       </Form>

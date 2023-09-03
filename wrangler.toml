@@ -15,3 +15,8 @@ compatibility_date = "2023-04-20"
 binding = "DB" # i.e. available in your Worker on env.DB
 database_name = "memo_app"
 database_id = "91645aef-ed78-4075-b791-d8adbf7e30bc"
+
+[[kv_namespaces]]
+binding = "SESSION_KV"
+id = "e512fab1089941e29e2e4ffa97706bb5"
+preview_id = "3711e7c7459c4e549186beb8e14ee248"
