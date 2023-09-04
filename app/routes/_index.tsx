@@ -3,7 +3,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
 import {
   ActionArgs,
@@ -110,6 +109,11 @@ function MemoUnit({ memo }: MemoUnitProps) {
     setIsOpen(false);
   }
 
+  function handleDownload(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    window.open(`/memos/${memo.id}/download`);
+  }
+
   return (
     <>
       <Link to={`/memos/${memo.id}/edit`}>
@@ -131,7 +135,7 @@ function MemoUnit({ memo }: MemoUnitProps) {
             <p className="truncate">{memo.content}</p>
           </CardContent>
           <CardFooter className="flex justify-end gap-4">
-            <Button>Markdown形式でダウンロード</Button>
+            <Button onClick={handleDownload}>Markdown形式でダウンロード</Button>
             <Button variant={"destructive"} type="button" onClick={handleOpen}>
               削除
             </Button>
