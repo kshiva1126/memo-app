@@ -1,4 +1,11 @@
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+import {
   ActionArgs,
   json,
   redirect,
@@ -6,19 +13,25 @@ import {
   type V2_MetaFunction,
 } from "@remix-run/cloudflare";
 import { Form, Link, useLoaderData } from "@remix-run/react";
-import { InferModelFromColumns, InferSelectModel, eq, sql } from "drizzle-orm";
+import { InferSelectModel, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
+import {
+  AlertDialogFooter,
+  AlertDialogHeader,
+} from "~/components/ui/alert-dialog";
 import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { memos } from "~/db/schema";
 import { getAuthenticator } from "~/features/common/services/auth.server";
+import { MouseEvent, useState } from "react";
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -83,6 +96,67 @@ export async function loader({ request, context }: LoaderArgs) {
   });
 }
 
+type MemoUnitProps = {
+  memo: InferSelectModel<typeof memos>;
+};
+
+function MemoUnit({ memo }: MemoUnitProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  function handleOpen(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    setIsOpen(true);
+  }
+  function handleClose() {
+    setIsOpen(false);
+  }
+
+  return (
+    <>
+      <Link to={`/memos/${memo.id}/edit`}>
+        <Card className="hover:shadow-md">
+          <CardHeader>
+            <CardTitle>{memo.title}</CardTitle>
+            <CardDescription>
+              {memo?.updated_at && (
+                <span>
+                  {new Date(memo.updated_at).toLocaleString("ja-JP", {
+                    timeZone: "Asia/Tokyo",
+                  })}
+                  に更新
+                </span>
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="truncate">{memo.content}</p>
+          </CardContent>
+          <CardFooter className="flex justify-end gap-4">
+            <Button>Markdown形式でダウンロード</Button>
+            <Button variant={"destructive"} type="button" onClick={handleOpen}>
+              削除
+            </Button>
+          </CardFooter>
+        </Card>
+      </Link>
+      <AlertDialog open={isOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            タイトル: {memo.title}を削除しますか？
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleClose}>
+              キャンセル
+            </AlertDialogCancel>
+            <Form method="post" action={`/memos/${memo.id}/delete`}>
+              <AlertDialogAction type="submit">削除する</AlertDialogAction>
+            </Form>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
 export default function Index() {
   const data = useLoaderData<typeof loader>();
 
@@ -114,26 +188,7 @@ export default function Index() {
             <h2 className="text-lg">List</h2>
             <div className="mt-2 flex flex-col gap-2">
               {data.list.map((memo) => (
-                <Link key={memo.id} to={`/memos/${memo.id}/edit`}>
-                  <Card className="hover:shadow-md">
-                    <CardHeader>
-                      <CardTitle>{memo.title}</CardTitle>
-                      <CardDescription>
-                        {memo?.updated_at && (
-                          <span>
-                            {new Date(memo.updated_at).toLocaleString("ja-JP", {
-                              timeZone: "Asia/Tokyo",
-                            })}
-                            に更新
-                          </span>
-                        )}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="truncate">{memo.content}</p>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <MemoUnit key={memo.id} memo={memo} />
               ))}
             </div>
           </section>

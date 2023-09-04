@@ -11,7 +11,7 @@ import { Editor } from "~/components/Editor";
 import { Button } from "~/components/ui/button";
 import { drizzle } from "drizzle-orm/d1";
 import { memos } from "~/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Input } from "~/components/ui/input";
 import { useToast } from "~/components/ui/use-toast";
 import { getAuthenticator } from "~/features/common/services/auth.server";
@@ -53,8 +53,7 @@ export async function loader({ request, params, context }: LoaderArgs) {
   const data = await db
     .select()
     .from(memos)
-    .where(eq(memos.user_id, user.id))
-    .where(eq(memos.id, memoId))
+    .where(and(eq(memos.user_id, user.id), eq(memos.id, memoId)))
     .get();
 
   if (!data) {
